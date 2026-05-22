@@ -16,16 +16,22 @@ ask() {
 # ── Prerequisites ──────────────────────────────────────────────
 for cmd in git curl; do
   if ! command -v "$cmd" &>/dev/null; then
-    echo "ERROR: $cmd is required. Install it first: sudo apt install -y $cmd"
+    echo "ERROR: $cmd is required. Install it first:"
+    echo "  Linux:  sudo apt install -y $cmd"
+    echo "  macOS:  xcode-select --install"
     exit 1
   fi
 done
 
+OS=$(uname -s)
 ARCH=$(uname -m)
-case "$ARCH" in
-  x86_64)  ARCH_ALT="amd64"; ARCH_LS="x64" ;;
-  aarch64) ARCH_ALT="arm64"; ARCH_LS="arm64" ;;
-  *)       echo "ERROR: unsupported architecture $ARCH"; exit 1 ;;
+
+case "$OS-$ARCH" in
+  Linux-x86_64)  OS_ALT="linux";  ARCH_ALT="amd64"; ARCH_LS="linux-x64"   ;;
+  Linux-aarch64) OS_ALT="linux";  ARCH_ALT="arm64"; ARCH_LS="linux-arm64"  ;;
+  Darwin-arm64)  OS_ALT="darwin"; ARCH_ALT="arm64"; ARCH_LS="darwin-arm64" ;;
+  Darwin-x86_64) OS_ALT="darwin"; ARCH_ALT="amd64"; ARCH_LS="darwin-x64"  ;;
+  *) echo "ERROR: unsupported $OS-$ARCH"; exit 1 ;;
 esac
 
 export PATH="$HOME/.local/bin:$HOME/.bun/bin:$PATH"
@@ -90,7 +96,7 @@ if ask "terraform-ls (HCL/OpenTofu)"; then
     else
       LATEST=$(curl -sL https://api.github.com/repos/hashicorp/terraform-ls/releases/latest | grep tag_name | cut -d'"' -f4)
     fi
-    curl -sL "https://releases.hashicorp.com/terraform-ls/${LATEST#v}/terraform-ls_${LATEST#v}_linux_${ARCH_ALT}.zip" -o /tmp/tfls.zip
+    curl -sL "https://releases.hashicorp.com/terraform-ls/${LATEST#v}/terraform-ls_${LATEST#v}_${OS_ALT}_${ARCH_ALT}.zip" -o /tmp/tfls.zip
     unzip -o /tmp/tfls.zip terraform-ls -d "$HOME/.local/bin/" 2>/dev/null && rm /tmp/tfls.zip
     chmod +x "$HOME/.local/bin/terraform-ls"
   fi
@@ -99,7 +105,7 @@ fi
 if ask "lua-language-server (for Neovim config)"; then
   echo "==> Installing lua-language-server"
   if ! command -v lua-language-server &>/dev/null; then
-    curl -sL "https://github.com/LuaLS/lua-language-server/releases/latest/download/lua-language-server-linux-${ARCH_LS}.tar.gz" -o /tmp/luals.tar.gz
+    curl -sL "https://github.com/LuaLS/lua-language-server/releases/latest/download/lua-language-server-${ARCH_LS}.tar.gz" -o /tmp/luals.tar.gz
     tar xzf /tmp/luals.tar.gz -C /tmp 2>/dev/null
     install -m 755 /tmp/bin/lua-language-server "$HOME/.local/bin/" 2>/dev/null
     rm -rf /tmp/luals.tar.gz /tmp/bin

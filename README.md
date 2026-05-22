@@ -31,6 +31,8 @@ dotfiles ls-files
 
 ## Bootstrap a new machine
 
+Works on **Linux** (x86_64/arm64) and **macOS** (Apple Silicon/Intel).
+
 Interactive — prompts for each component:
 
 ```bash
