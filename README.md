@@ -1,6 +1,14 @@
 # dotfiles
 
-Managed via a [bare git repo](https://www.atlassian.com/git/tutorials/dotfiles) with `--work-tree=$HOME`.
+Managed via a bare Git repository using:
+
+```bash
+git --git-dir=$HOME/.dotfiles --work-tree=$HOME
+```
+
+Based on the Atlassian bare repo dotfiles approach.
+
+---
 
 ## What's tracked
 
@@ -10,46 +18,172 @@ Managed via a [bare git repo](https://www.atlassian.com/git/tutorials/dotfiles) 
 | `.config/fish/config.fish` | Fish shell config + abbreviations |
 | `.config/mise/config.toml` | Mise tool versions |
 | `.gitconfig` | Git configuration |
-| `.dotfiles-bootstrap.sh` | Bootstrap script for new machines |
-| `.profile` (via boostrap) | Mise shims added to PATH on login |
+| `.dotfiles-bootstrap.sh` | Bootstrap script |
+| `.profile` | PATH setup for mise shims |
 
-Also tracked separately:
-- [Neovim config](https://github.com/yerdzxc/nvim) (NvChad-based, independent repo at `~/.config/nvim`)
+Separate repository:
 
-> **Security:** Only non-sensitive configs are tracked. Before adding any file, verify it contains no tokens, keys, or personal data. Secrets belong in environment variables or password managers, not dotfiles.
+- Neovim config: https://github.com/yerdzxc/nvim
 
-## Usage
+---
 
-```bash
-# Daily use — add/commit/push new configs
-dotfiles add .config/some-file
-dotfiles commit -m "add some-file"
-dotfiles push
+## Security
 
-# See what's tracked
-dotfiles ls-files
-```
+Only non-sensitive configs are tracked.
 
-## Bootstrap a new machine
+Never commit:
 
-Works on **Linux** (x86_64/arm64) and **macOS** (Apple Silicon/Intel).
+- API keys
+- tokens
+- `.env` files
+- SSH private keys
+- cloud credentials
+- personal secrets
 
-Interactive — prompts for each component:
+Use:
+
+- environment variables
+- password managers
+- secret management systems
+
+instead of storing secrets in dotfiles.
+
+---
+
+## Bootstrap
+
+Supported platforms:
+
+- Linux x86_64
+- Linux arm64
+- macOS Intel
+- macOS Apple Silicon
+
+Interactive install:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/yerdzxc/dotfiles/master/.dotfiles-bootstrap.sh | bash
 ```
 
-Non-interactive (installs everything):
+Non-interactive install:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/yerdzxc/dotfiles/master/.dotfiles-bootstrap.sh | bash -s -- -y
 ```
 
-## Tools installed
+---
 
-Managed by **mise**: neovim, tmux, lazygit, bat, eza, fd, fzf, ripgrep, zoxide, go, gh, tree-sitter, aws
+## Installed Components
 
-Installed via **bun** (global): typescript-language-server, yaml-language-server, bash-language-server, dockerfile-language-server-nodejs, vscode-langservers-extracted
+### Runtime / Tool Manager
 
-Native binaries: terraform-ls, lua-language-server
+- mise
+
+### Shell / CLI Tools
+
+Installed through mise:
+
+- neovim
+- tmux
+- lazygit
+- bat
+- eza
+- fd
+- fzf
+- ripgrep
+- zoxide
+- go
+- gh
+
+### Language Servers
+
+Installed through bun:
+
+- typescript-language-server
+- yaml-language-server
+- bash-language-server
+- dockerfile-language-server-nodejs
+- vscode-langservers-extracted
+
+Native binaries:
+
+- terraform-ls
+- lua-language-server
+
+---
+
+## Usage
+
+Recommended shell function:
+
+```bash
+dotfiles() {
+  git --git-dir="$HOME/.dotfiles" --work-tree="$HOME" "$@"
+}
+```
+
+Examples:
+
+```bash
+dotfiles status
+
+dotfiles add .config/fish/config.fish
+
+dotfiles commit -m "update fish config"
+
+dotfiles push
+```
+
+List tracked files:
+
+```bash
+dotfiles ls-files
+```
+
+---
+
+## Troubleshooting
+
+### `command not found: dotfiles`
+
+Older versions used a Bash alias inside scripts.
+
+Aliases are not expanded in non-interactive shells by default.
+
+Fixed by using a shell function instead.
+
+### Checkout conflicts
+
+If bootstrap reports checkout conflicts:
+
+```bash
+git --git-dir=$HOME/.dotfiles --work-tree=$HOME checkout
+```
+
+Then move or back up conflicting files before retrying.
+
+### mise shims not detected
+
+Restart shell:
+
+```bash
+exec fish
+```
+
+or:
+
+```bash
+source ~/.profile
+```
+
+---
+
+## Philosophy
+
+This setup prioritizes:
+
+- reproducible environments
+- minimal dependencies
+- cross-platform compatibility
+- fast terminal workflows
+- clean developer onboarding
