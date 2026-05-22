@@ -256,6 +256,83 @@ if ask "Neovim config"; then
   fi
 fi
 
+# ── SSH Config ──────────────────────────────────────────────────
+
+if ask "SSH hardening (security and connection optimizations)"; then
+  echo "==> Configuring SSH"
+
+  mkdir -p "$HOME/.ssh" "$HOME/.ssh/controlmasters"
+  chmod 700 "$HOME/.ssh"
+
+  SSH_CONFIG="$HOME/.ssh/config"
+  MARKER="# ── dotfiles: security & optimizations ──"
+
+  if [ ! -f "$SSH_CONFIG" ]; then
+    cat > "$SSH_CONFIG" << 'SSHEOF'
+# ── Security ──────────────────────────────────────────
+StrictHostKeyChecking ask
+HashKnownHosts yes
+HostbasedAuthentication no
+IgnoreRhosts yes
+PermitLocalCommand no
+PubkeyAuthentication yes
+PasswordAuthentication no
+ChallengeResponseAuthentication no
+
+# ── Connection ────────────────────────────────────────
+TCPKeepAlive yes
+ServerAliveInterval 60
+ServerAliveCountMax 3
+
+# ── Multiplexing ──────────────────────────────────────
+ControlMaster auto
+ControlPath ~/.ssh/controlmasters/%r@%h:%p
+ControlPersist 10m
+
+# ── Convenience ───────────────────────────────────────
+AddKeysToAgent yes
+SSHEOF
+    chmod 600 "$SSH_CONFIG"
+    echo "  Created $SSH_CONFIG with security defaults"
+
+  elif ! grep -qF "$MARKER" "$SSH_CONFIG" 2>/dev/null; then
+    chmod 600 "$SSH_CONFIG"
+
+    {
+      echo ""
+      echo "$MARKER"
+      echo "Host *"
+    } >> "$SSH_CONFIG"
+
+    for setting in \
+      "StrictHostKeyChecking ask" \
+      "HashKnownHosts yes" \
+      "HostbasedAuthentication no" \
+      "IgnoreRhosts yes" \
+      "PermitLocalCommand no" \
+      "PubkeyAuthentication yes" \
+      "PasswordAuthentication no" \
+      "ChallengeResponseAuthentication no" \
+      "TCPKeepAlive yes" \
+      "ServerAliveInterval 60" \
+      "ServerAliveCountMax 3" \
+      "ControlMaster auto" \
+      "ControlPath ~/.ssh/controlmasters/%r@%h:%p" \
+      "ControlPersist 10m" \
+      "AddKeysToAgent yes"
+    do
+      key="${setting%% *}"
+      if ! grep -qs "^[[:space:]]*${key}[[:space:]]" "$SSH_CONFIG"; then
+        echo "  ${setting}" >> "$SSH_CONFIG"
+      fi
+    done
+
+    echo "  Appended missing settings to $SSH_CONFIG"
+  else
+    echo "  SSH settings already applied, skipping"
+  fi
+fi
+
 echo ""
 echo "========================================"
 echo "  Done!"

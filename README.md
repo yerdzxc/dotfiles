@@ -110,6 +110,17 @@ Native binaries:
 - terraform-ls
 - lua-language-server
 
+### SSH Config
+
+Security hardening and connection optimizations (applied by bootstrap, existing settings preserved):
+
+- `StrictHostKeyChecking ask`
+- `HashKnownHosts yes`
+- `HostbasedAuthentication no`
+- `PasswordAuthentication no`
+- `ServerAliveInterval 60`
+- `ControlMaster auto` with persistent multiplexing
+
 ---
 
 ## Usage
