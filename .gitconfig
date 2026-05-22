@@ -1,0 +1,4 @@
+[core]
+	editor = nvim
+[pager]
+	branch = less -R
