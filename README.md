@@ -13,7 +13,7 @@ Managed via a [bare git repo](https://www.atlassian.com/git/tutorials/dotfiles) 
 | `.dotfiles-bootstrap.sh` | Bootstrap script for new machines |
 
 Also tracked separately:
-- [Neovim config](https://github.com/yerdzxc/nvim) (independent repo at `~/.config/nvim`)
+- [Neovim config](https://github.com/yerdzxc/nvim) (NvChad-based, independent repo at `~/.config/nvim`)
 
 > **Security:** Only non-sensitive configs are tracked. Before adding any file, verify it contains no tokens, keys, or personal data. Secrets belong in environment variables or password managers, not dotfiles.
 
