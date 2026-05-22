@@ -270,16 +270,22 @@ if ask "SSH hardening (security and connection optimizations)"; then
   if [ ! -f "$SSH_CONFIG" ]; then
     cat > "$SSH_CONFIG" << 'SSHEOF'
 # ── Security ──────────────────────────────────────────
-StrictHostKeyChecking ask
-HashKnownHosts yes
 HostbasedAuthentication no
 IgnoreRhosts yes
 PermitLocalCommand no
+StrictHostKeyChecking ask
+HashKnownHosts yes
 PubkeyAuthentication yes
 PasswordAuthentication no
 ChallengeResponseAuthentication no
+ForwardAgent no
+ForwardX11 no
+LogLevel VERBOSE
 
-# ── Connection ────────────────────────────────────────
+# ── Performance ───────────────────────────────────────
+GSSAPIAuthentication no
+ConnectTimeout 10
+ConnectionAttempts 3
 TCPKeepAlive yes
 ServerAliveInterval 60
 ServerAliveCountMax 3
@@ -305,14 +311,20 @@ SSHEOF
     } >> "$SSH_CONFIG"
 
     for setting in \
-      "StrictHostKeyChecking ask" \
-      "HashKnownHosts yes" \
       "HostbasedAuthentication no" \
       "IgnoreRhosts yes" \
       "PermitLocalCommand no" \
+      "StrictHostKeyChecking ask" \
+      "HashKnownHosts yes" \
       "PubkeyAuthentication yes" \
       "PasswordAuthentication no" \
       "ChallengeResponseAuthentication no" \
+      "ForwardAgent no" \
+      "ForwardX11 no" \
+      "LogLevel VERBOSE" \
+      "GSSAPIAuthentication no" \
+      "ConnectTimeout 10" \
+      "ConnectionAttempts 3" \
       "TCPKeepAlive yes" \
       "ServerAliveInterval 60" \
       "ServerAliveCountMax 3" \

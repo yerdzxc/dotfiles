@@ -112,14 +112,15 @@ Native binaries:
 
 ### SSH Config
 
-Security hardening and connection optimizations (applied by bootstrap, existing settings preserved):
+Security hardening and performance optimizations (applied by bootstrap, existing settings preserved):
 
-- `StrictHostKeyChecking ask`
-- `HashKnownHosts yes`
-- `HostbasedAuthentication no`
-- `PasswordAuthentication no`
-- `ServerAliveInterval 60`
-- `ControlMaster auto` with persistent multiplexing
+- `StrictHostKeyChecking ask` — verify host keys
+- `ForwardAgent no` / `ForwardX11 no` — prevent forwarding leaks
+- `PasswordAuthentication no` / `ChallengeResponseAuthentication no` — key-only auth
+- `LogLevel VERBOSE` — log fingerprints for MITM detection
+- `GSSAPIAuthentication no` — skip Kerberos, faster connects
+- `ServerAliveInterval 60` — keep NAT sessions alive
+- `ControlMaster auto` — connection multiplexing
 
 ---
 
