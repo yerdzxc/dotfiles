@@ -261,7 +261,7 @@ fi
 if ask "SSH hardening (security and connection optimizations)"; then
   echo "==> Configuring SSH"
 
-  mkdir -p "$HOME/.ssh" "$HOME/.ssh/controlmasters"
+  mkdir -p "$HOME/.ssh" "$HOME/.ssh/sockets"
   chmod 700 "$HOME/.ssh"
 
   SSH_CONFIG="$HOME/.ssh/config"
@@ -269,33 +269,31 @@ if ask "SSH hardening (security and connection optimizations)"; then
 
   if [ ! -f "$SSH_CONFIG" ]; then
     cat > "$SSH_CONFIG" << 'SSHEOF'
-# ── Security ──────────────────────────────────────────
-HostbasedAuthentication no
-PermitLocalCommand no
-StrictHostKeyChecking ask
-HashKnownHosts yes
-PubkeyAuthentication yes
-PasswordAuthentication no
-ChallengeResponseAuthentication no
-ForwardAgent no
-ForwardX11 no
-LogLevel VERBOSE
+# GitHub
+Host github.com
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519
+    IdentitiesOnly yes
 
-# ── Performance ───────────────────────────────────────
-GSSAPIAuthentication no
-ConnectTimeout 10
-ConnectionAttempts 3
-TCPKeepAlive yes
-ServerAliveInterval 60
-ServerAliveCountMax 3
+Host *
+    ServerAliveInterval 60
+    ServerAliveCountMax 3
+    Compression yes
+    ForwardAgent no
+    ForwardX11 no
+    StrictHostKeyChecking ask
+    UserKnownHostsFile ~/.ssh/known_hosts
+    ControlMaster auto
+    ControlPath ~/.ssh/sockets/%r@%h:%p
+    ControlPersist 10m
+    HashKnownHosts yes
 
-# ── Multiplexing ──────────────────────────────────────
-ControlMaster auto
-ControlPath ~/.ssh/controlmasters/%r@%h:%p
-ControlPersist 10m
-
-# ── Convenience ───────────────────────────────────────
-AddKeysToAgent yes
+    # Security & Post-Quantum
+    KexAlgorithms mlkem768x25519-sha256,sntrup761x25519-sha512@openssh.com,curve25519-sha256@libssh.org
+    Ciphers chacha20-poly1305@openssh.com,aes128-gcm@openssh.com,aes256-gcm@openssh.com
+    IdentitiesOnly yes
+    VisualHostKey yes
 SSHEOF
     chmod 600 "$SSH_CONFIG"
     echo "  Created $SSH_CONFIG with security defaults"
@@ -306,8 +304,21 @@ SSHEOF
     {
       echo ""
       echo "$MARKER"
-      echo "Host *"
+      echo ""
     } >> "$SSH_CONFIG"
+
+    # Host github.com (only if no Host github.com block exists)
+    if ! grep -qs "^[[:space:]]*Host[[:space:]]\+github.com\([[:space:]]\|$\)" "$SSH_CONFIG"; then
+      {
+        echo "Host github.com"
+        echo "    HostName github.com"
+        echo "    User git"
+        echo "    IdentityFile ~/.ssh/id_ed25519"
+        echo "    IdentitiesOnly yes"
+      } >> "$SSH_CONFIG"
+    fi
+
+    echo "Host *" >> "$SSH_CONFIG"
 
     for setting in \
       "HostbasedAuthentication no" \
@@ -326,10 +337,15 @@ SSHEOF
       "TCPKeepAlive yes" \
       "ServerAliveInterval 60" \
       "ServerAliveCountMax 3" \
+      "Compression yes" \
+      "UserKnownHostsFile ~/.ssh/known_hosts" \
       "ControlMaster auto" \
-      "ControlPath ~/.ssh/controlmasters/%r@%h:%p" \
+      "ControlPath ~/.ssh/sockets/%r@%h:%p" \
       "ControlPersist 10m" \
-      "AddKeysToAgent yes"
+      "VisualHostKey yes" \
+      "KexAlgorithms mlkem768x25519-sha256,sntrup761x25519-sha512@openssh.com,curve25519-sha256@libssh.org" \
+      "Ciphers chacha20-poly1305@openssh.com,aes128-gcm@openssh.com,aes256-gcm@openssh.com" \
+      "IdentitiesOnly yes"
     do
       key="${setting%% *}"
       if ! grep -qs "^[[:space:]]*${key}[[:space:]]" "$SSH_CONFIG"; then

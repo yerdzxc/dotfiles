@@ -114,11 +114,11 @@ Native binaries:
 
 Security hardening and performance optimizations (applied by bootstrap, existing settings preserved):
 
+- `Host github.com` block with `IdentityFile` and `IdentitiesOnly yes`
 - `StrictHostKeyChecking ask` — verify host keys
 - `ForwardAgent no` / `ForwardX11 no` — prevent forwarding leaks
-- `PasswordAuthentication no` / `ChallengeResponseAuthentication no` — key-only auth
-- `LogLevel VERBOSE` — log fingerprints for MITM detection
-- `GSSAPIAuthentication no` — skip Kerberos, faster connects
+- `VisualHostKey yes` — visually verify host key fingerprint
+- Post-quantum `KexAlgorithms` and `Ciphers`
 - `ServerAliveInterval 60` — keep NAT sessions alive
 - `ControlMaster auto` — connection multiplexing
 
