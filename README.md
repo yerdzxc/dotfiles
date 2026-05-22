@@ -31,18 +31,16 @@ dotfiles ls-files
 
 ## Bootstrap a new machine
 
+Interactive — prompts for each component:
+
 ```bash
 curl -fsSL https://raw.githubusercontent.com/yerdzxc/dotfiles/master/.dotfiles-bootstrap.sh | bash
 ```
 
-Or manually:
+Non-interactive (installs everything):
 
 ```bash
-git clone --bare git@github.com:yerdzxc/dotfiles.git "$HOME/.dotfiles"
-alias dotfiles='git --git-dir=$HOME/.dotfiles --work-tree=$HOME'
-dotfiles checkout
-dotfiles config status.showUntrackedFiles no
-mise install
+curl -fsSL https://raw.githubusercontent.com/yerdzxc/dotfiles/master/.dotfiles-bootstrap.sh | bash -s -- -y
 ```
 
 ## Tools installed
