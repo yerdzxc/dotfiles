@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO_URL="https://github.com/yerdzxc/dotfiles.git"
-NVIM_REPO="https://github.com/yerdzxc/nvim.git"
+REPO_URL="git@github.com:yerdzxc/dotfiles.git"
+NVIM_REPO="git@github.com:yerdzxc/nvim.git"
 
 AUTO=0
 [ "${1:-}" = "-y" ] && AUTO=1
