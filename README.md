@@ -11,6 +11,7 @@ Managed via a [bare git repo](https://www.atlassian.com/git/tutorials/dotfiles) 
 | `.config/mise/config.toml` | Mise tool versions |
 | `.gitconfig` | Git configuration |
 | `.dotfiles-bootstrap.sh` | Bootstrap script for new machines |
+| `.profile` (via boostrap) | Mise shims added to PATH on login |
 
 Also tracked separately:
 - [Neovim config](https://github.com/yerdzxc/nvim) (NvChad-based, independent repo at `~/.config/nvim`)

@@ -71,6 +71,13 @@ if ask "dotfiles (tmux, fish, git, mise configs)"; then
   dotfiles config status.showUntrackedFiles no
 fi
 
+# ── Environment ─────────────────────────────────────────────────
+if command -v mise &>/dev/null; then
+  if ! grep -q "mise/shims" "$HOME/.profile" 2>/dev/null; then
+    echo 'export PATH="$HOME/.local/share/mise/shims:$PATH"' >> "$HOME/.profile"
+  fi
+fi
+
 # ── Mise tools ──────────────────────────────────────────────────
 if command -v mise &>/dev/null && ask "mise tools (neovim, tmux, lazygit, bat, eza, fd, fzf, rg, zoxide, go, gh)"; then
   echo "==> Installing mise tools"
