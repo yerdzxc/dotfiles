@@ -271,7 +271,6 @@ if ask "SSH hardening (security and connection optimizations)"; then
     cat > "$SSH_CONFIG" << 'SSHEOF'
 # ── Security ──────────────────────────────────────────
 HostbasedAuthentication no
-IgnoreRhosts yes
 PermitLocalCommand no
 StrictHostKeyChecking ask
 HashKnownHosts yes
@@ -312,7 +311,6 @@ SSHEOF
 
     for setting in \
       "HostbasedAuthentication no" \
-      "IgnoreRhosts yes" \
       "PermitLocalCommand no" \
       "StrictHostKeyChecking ask" \
       "HashKnownHosts yes" \
